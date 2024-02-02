@@ -2,3 +2,4 @@ flask
 google-api-python-client
 pandas
 youtube-transcript-api
+pysentimiento

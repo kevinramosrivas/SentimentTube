@@ -2,6 +2,8 @@ import pandas as pd
 from youtube_transcript_api import YouTubeTranscriptApi
 
 
+
+
 def getTranscript(link):
     textTranscript = []
     try:

@@ -8,15 +8,15 @@ from config.keys import api_service_name, api_version, DEVELOPER_KEY, allowed_fi
 def select_fields(link):
     comments = {}
     response = getComment(link)
+    #seleccionar solo los campos permitidos
     for item in response['items']:
         comment = item['snippet']['topLevelComment']['snippet']
-        #seleccionar los campos que se van a guardar
-        comment = {field: comment[field] for field in allowed_fields}
+        comment = {key: comment[key] for key in allowed_fields}
         comments[comment['textOriginal']] = comment
     #retornar los comentarios en un dataframe
-    return pd.DataFrame.from_dict(comments, orient='index')
-    
-    
+    return pd.DataFrame.from_dict(comments,orient='index')
+
+
 
 def getComment(link):
     comments = {}
