@@ -3,6 +3,7 @@ import pandas as pd
 from app.comments import select_fields
 from app.transcript import getTranscript
 from app.preprocess import preprocess_comments, preprocess_transcript
+from app.sentiment_analysis import get_sentiment
 import json
 
 def create_app():
@@ -19,8 +20,10 @@ def create_app():
         transcript = getTranscript(link)
         comments = preprocess_comments(comments)
         transcript = preprocess_transcript(transcript)
-        comments.to_csv('comments.csv',index = False)
-        transcript.to_csv('transcript.csv',index = False)
+        comments = get_sentiment(comments)
+        transcript = get_sentiment(transcript)
+        comments.to_csv('data_csv/comments.csv',index = False)
+        transcript.to_csv('data_csv/transcript.csv',index = False)
         return 'ok'
     
     return app
