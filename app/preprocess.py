@@ -24,7 +24,9 @@ def preprocess_comments(dataframe):
     dataframe['textPreprocess'] = dataframe['textOriginal'].apply(preprocess_tweet)
     #aplicar el preprocesamiento de remove_stopwords a la columna textPreprocess
     dataframe['textPreprocess'] = dataframe['textPreprocess'].apply(remove_stopwords)
+    #retornar un array de comentarios preprocesados, nombre de usuario, fecha de publicacion
     return dataframe
+
 
 def preprocess_transcript(dataframe):
     dataframe['textPreprocess'] = dataframe['text'].apply(preprocess_tweet)
