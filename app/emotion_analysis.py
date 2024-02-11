@@ -21,6 +21,6 @@ def get_emotion_full_text(dataframe):
 
 
 def calculate_distribution(dataframe):
-    emotions = dataframe['emotion'].value_counts(normalize=True)
+    emotions = dataframe['emotion'].value_counts()
     #retornar los valores como un diccionario
     return emotions.to_dict()

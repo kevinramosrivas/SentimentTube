@@ -1,5 +1,8 @@
 from pysentimiento.preprocessing import preprocess_tweet
 import multiprocessing as mp
+import time
+from parallel_pandas import ParallelPandas
+
 """ 
 se tiene un array de comentarios, se deben preprocesar solo los textos de los comentarios
 [{
@@ -16,16 +19,22 @@ se tiene un array de comentarios, se deben preprocesar solo los textos de los co
 }]
 
 """
+ParallelPandas.initialize(n_cpu=mp.cpu_count(), split_factor=40, disable_pr_bar=False)
 
 def preprocess_comments(dataframe):
-    with mp.Pool(mp.cpu_count()) as pool:
-        dataframe['textPreprocess'] = pool.map(preprocess_tweet, dataframe['textOriginal'])
-    #retornar un array de comentarios preprocesados, nombre de usuario, fecha de publicacion
+    #medir el tiempo de ejecucion
+    timeinit = time.time()
+    dataframe['textPreprocess'] =  dataframe['textOriginal'].p_apply(preprocess_tweet)
+    timeend = time.time()
+    print('Tiempo de ejecucion preprocesamiento: ', timeend - timeinit)
     return dataframe
 
 
+
+
+
 def preprocess_transcript(dataframe):
-    dataframe['textPreprocess'] = dataframe['text'].apply(preprocess_tweet)
+    dataframe['textPreprocess'] = dataframe['text'].p_apply(preprocess_tweet)
     return dataframe
 
 

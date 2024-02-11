@@ -4,3 +4,5 @@ pandas
 youtube-transcript-api
 pysentimiento
 nltk
+parallel_pandas
+dask
