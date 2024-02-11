@@ -26,6 +26,8 @@ def create_app():
         return jsonify(distribution_transcript)
     
     # pasar oos parametros al end point getSentimentComments para que lo analice, se debe pasar un link y un maxResults
+    # este ebd point puede ser accedido por ejemplo desde http://127.0.0.1:105/getSentimentComments/?link=jSaSZ8omve0&maxResults=100
+    #donde maxResults es el numero de comentarios a analizar y es opcional
     @app.route('/getSentimentComments/', methods=['GET'])
     def getSentimentComments():
         link = request.args.get('link')
