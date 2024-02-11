@@ -1,7 +1,9 @@
 import pandas as pd
-import googleapiclient.discovery
+from googleapiclient.discovery import build
 #importamos las claves de la api
 from config.keys import api_service_name, api_version, DEVELOPER_KEY, allowed_fields
+from concurrent.futures import ThreadPoolExecutor
+youtube = build('youtube', 'v3', developerKey=DEVELOPER_KEY)
 
 
 
@@ -18,28 +20,37 @@ def select_fields(link):
 
 
 
-def getComment(link):
-    comments = {}
-    youtube = googleapiclient.discovery.build(
-    api_service_name, api_version, developerKey=DEVELOPER_KEY)
-    request = youtube.commentThreads().list(
-        part="snippet",
-        videoId=link,
-        maxResults=100
-    )
-    comments = request.execute()
-    while 'nextPageToken' in comments:
-        nextPage = youtube.commentThreads().list(
-            part="snippet",
-            videoId=link,
-            maxResults=100,
-            pageToken=comments['nextPageToken']
-        )
-        comments['items'] = comments['items'] + nextPage.execute()['items']
-        if 'nextPageToken' not in nextPage.execute():
-            break
-        comments['nextPageToken'] = nextPage.execute()['nextPageToken']
-        #detener si hay mas de 500 comentarios
-        if len(comments['items']) > 500:
-            break
-    return comments
+def getComment(link, maxResults=100):
+    comments = []
+    video_response = youtube.videos().list(
+        part='snippet',
+        id=link
+    ).execute()
+    video_snippet = video_response['items'][0]['snippet']
+    uploader_channel_id = video_snippet['channelId']
+    nextPageToken = None
+
+    def process_comment(item):
+        comment = item['snippet']['topLevelComment']['snippet']
+        if comment['authorChannelId']['value'] != uploader_channel_id:
+            #seleccionamos solo los campos permitidos ['authorDisplayName', 'publishedAt', 'likeCount', 'textOriginal']
+            return {key: comment[key] for key in allowed_fields}
+        return None
+
+    with ThreadPoolExecutor() as executor:
+        while len(comments) < maxResults:
+            request = youtube.commentThreads().list(
+                part='snippet',
+                videoId=link,
+                maxResults=100,
+                pageToken=nextPageToken
+            )
+            response = request.execute()
+            comment_results = executor.map(process_comment, response['items'])
+            comments.extend([comment for comment in comment_results if comment is not None])
+            nextPageToken = response.get('nextPageToken')
+            if not nextPageToken:
+                break
+    return pd.DataFrame(comments)
+
+
