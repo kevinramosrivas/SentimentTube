@@ -60,5 +60,21 @@ def getComment(link, maxResults=100):
     print('Tiempo de ejecucion obtencion comentarios: ', timeend - timeinit)
 
     return pd.DataFrame(comments, columns=['authorDisplayName', 'textOriginal'])
+#esta funcion solo obtendra 50 comentarios de un video
+def getCommentSimple(link):
+    comments = []
+    results = youtube.commentThreads().list(
+        part='snippet',
+        videoId=link,
+        textFormat='plainText',
+        maxResults=50
+    ).execute()
+
+    for item in results['items']:
+        comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
+        username = item['snippet']['topLevelComment']['snippet']['authorDisplayName']
+        comments.append([username, comment])
+
+    return pd.DataFrame(comments, columns=['authorDisplayName', 'textOriginal'])
 
 

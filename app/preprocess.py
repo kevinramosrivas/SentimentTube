@@ -19,7 +19,7 @@ se tiene un array de comentarios, se deben preprocesar solo los textos de los co
 }]
 
 """
-ParallelPandas.initialize(n_cpu=mp.cpu_count(), split_factor=40, disable_pr_bar=False)
+ParallelPandas.initialize(n_cpu=mp.cpu_count(), split_factor=8, disable_pr_bar=False)
 
 def preprocess_comments(dataframe):
     #medir el tiempo de ejecucion

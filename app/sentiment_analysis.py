@@ -13,7 +13,7 @@ analyzer = create_analyzer(task="sentiment", lang="es")
 """ se devuelve varios objetos de tipo AnalyzerOutput, cada uno con un texto y sus respectivas probabilidades de ser positivo, negativo o neutral
 ,se busca solo devolver output
 AnalyzerOutput(output=POS, probas={POS: 0.961, NEU: 0.033, NEG: 0.006}) """
-ParallelPandas.initialize(n_cpu=mp.cpu_count(), split_factor=40, disable_pr_bar=False)
+ParallelPandas.initialize(n_cpu=mp.cpu_count(), split_factor=8, disable_pr_bar=False)
 
 def get_sentiment(dataframe):
     #medir el tiempo de ejecucion

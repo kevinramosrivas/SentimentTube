@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from flask import Flask, request
 import pandas as pd
-from app.comments import select_fields, getComment
+from app.comments import select_fields, getComment, getCommentSimple
 from app.transcript import getTranscript
 from app.preprocess import preprocess_comments, preprocess_transcript
 from app.sentiment_analysis import get_sentiment
@@ -18,8 +18,9 @@ def create_app():
 
     # crear las rutas de la aplicacion
     # pasar un link al end point getText para que lo analice
+    # este end point puede ser accedido por ejemplo desde http://127.0.0.1:105/getEmotionTranscript/jSaSZ8omve0
     @app.route('/getEmotionTranscript/<link>', methods=['GET'])
-    def getText(link=None):
+    def getEmotionTranscript(link=None):
         transcript = getTranscript(link)
         transcript = preprocess_transcript(transcript)
         transcript, distribution_transcript = get_emotion(transcript)
@@ -37,7 +38,7 @@ def create_app():
             maxResults = 100
         #convertir maxResults a entero
         maxResults = int(maxResults)
-        comments = getComment(link, maxResults=maxResults)
+        comments = getCommentSimple(link)
         comments = preprocess_comments(comments)
         comments, distribution_comments = get_sentiment(comments)
         return jsonify(distribution_comments)
