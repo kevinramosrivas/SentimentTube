@@ -22,20 +22,12 @@ def select_fields(link):
 
 def getComment(link, maxResults=100):
     comments = []
-    video_response = youtube.videos().list(
-        part='snippet',
-        id=link
-    ).execute()
-    video_snippet = video_response['items'][0]['snippet']
-    uploader_channel_id = video_snippet['channelId']
     nextPageToken = None
 
     def process_comment(item):
         comment = item['snippet']['topLevelComment']['snippet']
-        if comment['authorChannelId']['value'] != uploader_channel_id:
-            #seleccionamos solo los campos permitidos ['authorDisplayName', 'publishedAt', 'likeCount', 'textOriginal']
-            return {key: comment[key] for key in allowed_fields}
-        return None
+        #seleccionamos solo los campos permitidos ['authorDisplayName', 'publishedAt', 'likeCount', 'textOriginal']
+        return {key: comment[key] for key in allowed_fields}
 
     with ThreadPoolExecutor() as executor:
         while len(comments) < maxResults:

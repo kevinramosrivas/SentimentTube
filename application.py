@@ -31,6 +31,8 @@ def create_app():
         link = request.args.get('link')
         #maxResults debe ser un numero entero
         maxResults = request.args.get('maxResults')
+        if maxResults is None:
+            maxResults = 100
         #convertir maxResults a entero
         maxResults = int(maxResults)
         comments = getComment(link, maxResults=maxResults)
