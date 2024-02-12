@@ -19,9 +19,10 @@ se tiene un array de comentarios, se deben preprocesar solo los textos de los co
 }]
 
 """
-ParallelPandas.initialize(n_cpu=mp.cpu_count(), split_factor=8, disable_pr_bar=False)
+
 
 def preprocess_comments(dataframe):
+    ParallelPandas.initialize(n_cpu=mp.cpu_count(), split_factor=4, disable_pr_bar=False)
     #medir el tiempo de ejecucion
     timeinit = time.time()
     dataframe['textPreprocess'] =  dataframe['textOriginal'].p_apply(preprocess_tweet)
@@ -34,6 +35,7 @@ def preprocess_comments(dataframe):
 
 
 def preprocess_transcript(dataframe):
+    ParallelPandas.initialize(n_cpu=mp.cpu_count(), split_factor=10, disable_pr_bar=False)
     dataframe['textPreprocess'] = dataframe['text'].p_apply(preprocess_tweet)
     return dataframe
 

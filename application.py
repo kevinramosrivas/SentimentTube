@@ -41,6 +41,10 @@ def create_app():
         comments = getCommentSimple(link)
         comments = preprocess_comments(comments)
         comments, distribution_comments = get_sentiment(comments)
-        return jsonify(distribution_comments)
+        return jsonify({
+            'distribution_comments': distribution_comments,
+            'comments': comments
+        })
+        
 
     return app

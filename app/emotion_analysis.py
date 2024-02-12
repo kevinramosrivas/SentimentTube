@@ -1,14 +1,25 @@
 from pysentimiento import create_analyzer
 import transformers
+from collections import Counter
+import concurrent.futures
 
 transformers.logging.set_verbosity(transformers.logging.ERROR)
 
 emotion_analyzer = create_analyzer(task="emotion", lang="es")
 
 
+
+
 def get_emotion(dataframe):
     emotions = emotion_analyzer.predict(dataframe['textPreprocess'])
-    dataframe['emotion'] = [emotion.output for emotion in emotions]
+
+    def process_emotion(emotion):
+        return emotion.output
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = executor.map(process_emotion, emotions)
+        dataframe['emotion'] = list(results)
+
     distribution_emotions = calculate_distribution(dataframe)
     return dataframe, distribution_emotions
 
@@ -21,6 +32,5 @@ def get_emotion_full_text(dataframe):
 
 
 def calculate_distribution(dataframe):
-    emotions = dataframe['emotion'].value_counts()
-    #retornar los valores como un diccionario
-    return emotions.to_dict()
+    emotions = Counter(dataframe['emotion'])
+    return emotions

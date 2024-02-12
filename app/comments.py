@@ -22,6 +22,13 @@ def select_fields(link):
 
 
 
+
+def process_item(item):
+    comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
+    username = item['snippet']['topLevelComment']['snippet']['authorDisplayName']
+    return [username, comment]
+
+
 def getComment(link, maxResults=100):
     #medir el tiempo de ejecucion
     timeinit = time.time()
@@ -32,11 +39,6 @@ def getComment(link, maxResults=100):
         textFormat='plainText',
         maxResults=100
     ).execute()
-
-    def process_item(item):
-        comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
-        username = item['snippet']['topLevelComment']['snippet']['authorDisplayName']
-        return [username, comment]
 
     with ThreadPoolExecutor() as executor:
         while results:
@@ -62,6 +64,8 @@ def getComment(link, maxResults=100):
     return pd.DataFrame(comments, columns=['authorDisplayName', 'textOriginal'])
 #esta funcion solo obtendra 50 comentarios de un video
 def getCommentSimple(link):
+    #medir el tiempo de ejecucion
+    timeinit = time.time()
     comments = []
     results = youtube.commentThreads().list(
         part='snippet',
@@ -70,11 +74,13 @@ def getCommentSimple(link):
         maxResults=50
     ).execute()
 
-    for item in results['items']:
-        comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
-        username = item['snippet']['topLevelComment']['snippet']['authorDisplayName']
-        comments.append([username, comment])
-
+    with ThreadPoolExecutor() as executor:
+        futures = [executor.submit(process_item, item) for item in results['items']]
+        for future in as_completed(futures):
+            comments.append(future.result())
+    #medir el tiempo de ejecucion
+    timeend = time.time()
+    print('Tiempo de ejecucion obtencion comentarios: ', timeend - timeinit)
     return pd.DataFrame(comments, columns=['authorDisplayName', 'textOriginal'])
 
 
