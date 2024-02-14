@@ -1,0 +1,9 @@
+#####3
+GET http://127.0.0.1:105/getSentimentComments/?link=l--D8yslyUk
+
+#####2
+GET http://127.0.0.1:105/getSentimentComments?link=W4_oH3anYHU
+
+######
+
+GET http://127.0.0.1:105/getEmotionTranscript/?link=W4_oH3anYHU
