@@ -22,9 +22,14 @@ def create_app():
     @app.route('/getEmotionTranscript/<link>', methods=['GET'])
     def getEmotionTranscript(link=None):
         transcript = getTranscript(link)
-        transcript = preprocess_transcript(transcript)
-        transcript, distribution_transcript = get_emotion(transcript)
-        return jsonify(distribution_transcript)
+        preproces_transcript = preprocess_transcript(transcript)
+        transcript, distribution_transcript = get_emotion(preproces_transcript)
+        return jsonify(
+            {
+                'distribution_transcript': distribution_transcript,
+                'transcript': transcript
+            }
+        )
     
     # pasar oos parametros al end point getSentimentComments para que lo analice, se debe pasar un link y un maxResults
     # este ebd point puede ser accedido por ejemplo desde http://127.0.0.1:105/getSentimentComments/?link=jSaSZ8omve0&maxResults=100
@@ -34,11 +39,12 @@ def create_app():
         link = request.args.get('link')
         #maxResults debe ser un numero entero
         maxResults = request.args.get('maxResults')
-        if maxResults is None:
-            maxResults = 100
-        #convertir maxResults a entero
-        maxResults = int(maxResults)
-        comments = getCommentSimple(link)
+        #convertir maxResults a entero si es que no es nulo
+        if maxResults!=None:
+            maxResults = int(maxResults)
+        else:
+            maxResults = 50
+        comments = getComment(link, maxResults)
         comments = preprocess_comments(comments)
         comments, distribution_comments = get_sentiment(comments)
         return jsonify({

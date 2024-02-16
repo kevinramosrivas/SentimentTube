@@ -29,7 +29,9 @@ def process_item(item):
     return [username, comment]
 
 
-def getComment(link, maxResults=100):
+def getComment(link, maxResults=50):
+    if(maxResults < 100):
+        return getCommentSimple(link, maxResults)
     #medir el tiempo de ejecucion
     timeinit = time.time()
     comments = []
@@ -39,31 +41,36 @@ def getComment(link, maxResults=100):
         textFormat='plainText',
         maxResults=100
     ).execute()
+    if(maxResults > 100):
+        with ThreadPoolExecutor() as executor:
+            while results:
+                futures = [executor.submit(process_item, item) for item in results['items']]
+                for future in as_completed(futures):
+                    comments.append(future.result())
 
-    with ThreadPoolExecutor() as executor:
-        while results:
+                if ('nextPageToken' in results) and (len(comments) <= maxResults):
+                    nextPage = results['nextPageToken']
+                    results = youtube.commentThreads().list(
+                        part='snippet',
+                        videoId=link,
+                        textFormat='plainText',
+                        pageToken=nextPage,
+                        maxResults=100
+                    ).execute()
+                else:
+                    break
+    else:
+        with ThreadPoolExecutor() as executor:
             futures = [executor.submit(process_item, item) for item in results['items']]
             for future in as_completed(futures):
                 comments.append(future.result())
-
-            if ('nextPageToken' in results) and (len(comments) <= maxResults):
-                nextPage = results['nextPageToken']
-                results = youtube.commentThreads().list(
-                    part='snippet',
-                    videoId=link,
-                    textFormat='plainText',
-                    pageToken=nextPage,
-                    maxResults=50
-                ).execute()
-            else:
-                break
     #medir el tiempo de ejecucion
     timeend = time.time()
     print('Tiempo de ejecucion obtencion comentarios: ', timeend - timeinit)
 
     return pd.DataFrame(comments, columns=['authorDisplayName', 'textOriginal'])
-#esta funcion solo obtendra 50 comentarios de un video
-def getCommentSimple(link):
+#esta funcion solo obtendra solo los primeros 100 comentarios
+def getCommentSimple(link, maxResults=50):
     #medir el tiempo de ejecucion
     timeinit = time.time()
     comments = []
@@ -71,7 +78,7 @@ def getCommentSimple(link):
         part='snippet',
         videoId=link,
         textFormat='plainText',
-        maxResults=50
+        maxResults=maxResults
     ).execute()
 
     with ThreadPoolExecutor() as executor:

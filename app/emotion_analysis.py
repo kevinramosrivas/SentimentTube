@@ -11,15 +11,14 @@ emotion_analyzer = create_analyzer(task="emotion", lang="es")
 
 
 def get_emotion(dataframe):
+    if (type(dataframe) == str):
+        return dataframe, 'No se puede analizar la emocion de un string'
     emotions = emotion_analyzer.predict(dataframe['textPreprocess'])
-
     def process_emotion(emotion):
         return emotion.output
-
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = executor.map(process_emotion, emotions)
         dataframe['emotion'] = list(results)
-
     distribution_emotions = calculate_distribution(dataframe)
     return dataframe, distribution_emotions
 
