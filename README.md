@@ -34,7 +34,7 @@ Ejemplo de uso:
 GET http://127.0.0.1:105/getEmotionTranscript/jSaSZ8omve0
 ```
 
-### 2. `/getSentimentComments/`
+### 2. `/getSentimentComments/?link=<link>&maxResults=<maxResults>`
 
 Este endpoint recibe un enlace a un video de YouTube y opcionalmente el número máximo de comentarios a analizar, y devuelve los comentarios junto con la distribución de sentimientos detectados en los comentarios.
 
