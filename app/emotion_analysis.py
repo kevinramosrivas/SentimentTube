@@ -20,6 +20,8 @@ def get_emotion(dataframe):
         results = executor.map(process_emotion, emotions)
         dataframe['emotion'] = list(results)
     distribution_emotions = calculate_distribution(dataframe)
+    #convertir el dataframe a un diccionario
+    dataframe = dataframe.to_dict(orient='records')
     return dataframe, distribution_emotions
 
 
