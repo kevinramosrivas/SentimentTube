@@ -46,10 +46,11 @@ def create_app():
             maxResults = 50
         comments = getComment(link, maxResults)
         comments = preprocess_comments(comments)
-        comments, distribution_comments = get_sentiment(comments)
+        comments, distribution_comments, words_count = get_sentiment(comments)
         return jsonify({
             'distribution_comments': distribution_comments,
-            'comments': comments
+            'comments': comments,
+            'words': words_count
         })
         
 
