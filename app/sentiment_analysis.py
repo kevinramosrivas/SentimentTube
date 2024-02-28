@@ -42,5 +42,5 @@ def get_distribution(dataframe):
 def word_counts(dataframe):
     texto = " ".join(dataframe["textPreprocess"])
     word_counts = Counter(texto.split())
-    most_common_words = word_counts.most_common(10)
+    most_common_words = dict(word_counts.most_common(10))
     return most_common_words
