@@ -4,6 +4,9 @@ import time
 from parallel_pandas import ParallelPandas
 #importar la libreria reg
 import re
+import nltk
+# nltk.download('stopwords') #usar solo una vez
+from nltk.corpus import stopwords
 
 """ 
 se tiene un array de comentarios, se deben preprocesar solo los textos de los comentarios
@@ -53,12 +56,16 @@ def preprocess_transcript(dataframe):
 
 def preprocess_text(text):
     text = preprocess_tweet(text)
+    stop_words = set(stopwords.words('spanish'))
     # usar la libreria reg para eliminar los caracteres especiales
     text = re.sub(r'[^\w\s]', '', text)
     text = re.sub(r'<.*?>', '', text)
     text = re.sub(r'http\S+', '', text)
     text = re.sub(r'[^a-zA-ZñÑáéíóúÁÉÍÓÚ]', ' ', text)
     text = text.lower()
+    tokens = text.split()
+    tokens = list(filter(lambda token: token not in stop_words, tokens))
+    text = ' '.join(tokens)
     return text
 
 
